@@ -1,4 +1,4 @@
 Cpp-code
 ========
 
-C++ programming language examples
+C++ programming language coding examples
