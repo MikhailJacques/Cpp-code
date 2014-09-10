@@ -35,3 +35,8 @@
 *.lastbuildstate
 *.pdb
 *.idb
+*.ico
+*.rc
+*.filters
+*.ipch
+*.log
