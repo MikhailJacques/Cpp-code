@@ -39,4 +39,7 @@
 *.rc
 *.filters
 *.ipch
-*.log
+*.lo
+
+# ProcessSchedulingSimulation log file
+logfile.txt
