@@ -27,16 +27,16 @@ map<char, size_t> key_word( const string & w )
 {
 	// Declare a map which is an associative container that will store a key value and a mapped value pairs
 	// The key value is a letter in a word and the maped value is the number of times this letter appears in the word
-   map<char, size_t> m;
+	map<char, size_t> m;
 
-   // Step over the characters of string w and use each character as a key value in the map
-   for ( auto & c : w )
-   {
-	    // Access the mapped value directly by its corresponding key using the bracket operator
+	// Step over the characters of string w and use each character as a key value in the map
+	for ( auto & c : w )
+	{
+		// Access the mapped value directly by its corresponding key using the bracket operator
 		++m[toupper( c )];	
-   }
+	}
 
-   return ( m );
+	return ( m );
 }
 
 
@@ -60,27 +60,27 @@ bool IsAnagram_3( const string & w1, const string & w2 )
 	unordered_map<char, size_t> m;
 
 	// Loop over the characters of string w1 incrementing the count for each character
-   for ( auto & c : w1 )
-   {
-	    // Access the mapped value directly by its corresponding key using the bracket operator
+	for ( auto & c : w1 )
+	{
+		// Access the mapped value directly by its corresponding key using the bracket operator
 		++m[toupper(c)];	
-   }
+	}
 
-   	// Loop over the characters of string w2 decrementing the count for each character
-   for ( auto & c : w2 )
-   {
-	    // Access the mapped value directly by its corresponding key using the bracket operator
+	// Loop over the characters of string w2 decrementing the count for each character
+	for ( auto & c : w2 )
+	{
+		// Access the mapped value directly by its corresponding key using the bracket operator
 		--m[toupper(c)];	
-   }
+	}
 
-   // Check to see if the mapped values are all zeros
-   for ( auto & c : w2 )
-   {
+	// Check to see if the mapped values are all zeros
+	for ( auto & c : w2 )
+	{
 		if ( m[toupper(c)] != 0 )
 			return false;
-   }
+	}
 
-   return true;
+	return true;
 }
 
 
