@@ -27,7 +27,7 @@
 *.vcxproj
 *.filters
 
-# MS Visual Studio 2012 debug files
+# MS Visual Studio 2012 C++ debug files
 *.log
 *.tlog
 *.obj
@@ -41,6 +41,28 @@
 *.filters
 *.ipch
 *.lo
+*.cd
+*.opensdf
+
+# MS Visual Studio 2012 C# debug files
+*.config
+*.csproj
+*.txt
+*.cache
+*..manifest
+*.vshost.exe.manifest
+*TemporaryGeneratedFile_*
+AssemblyInfo.cs
+
+# MS Visual Studio 2012 UML files
+*.modelproj
+*.xml
+*.classdiagram
+*.classdiagram.*
+*.uml
+
+# Compressed files
+*.zip
 
 # ProcessSchedulingSimulation log file
 logfile.txt
