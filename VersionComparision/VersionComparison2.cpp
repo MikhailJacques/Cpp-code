@@ -53,7 +53,7 @@ istream & operator>>(istream & str, Version::VersionToken & digit)
     return str;
 }
 
-
+// Main application that tests the functionality of the algorithm
 int main()
 {
 	Version v1("3.0.1.5");

@@ -100,6 +100,7 @@ void testVersionComparison()
 	assert((Version("3.0.1.5") == Version("3.0.1.6")) == false);
 }
 
+// Main application that tests the functionality of the algorithm
 int main()
 {
 	testVersionComparison();
