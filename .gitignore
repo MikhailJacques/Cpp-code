@@ -26,6 +26,7 @@
 *.suo
 *.vcxproj
 *.filters
+*.vcxproj.user
 
 # MS Visual Studio 2012 C++ debug files
 *.log
