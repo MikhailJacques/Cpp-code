@@ -115,7 +115,7 @@ void *MemoryPool<T>::Allocate(unsigned chunk_size, bool use_memory_pool)
 	if (chunk_size > memory_chunk_size || use_memory_pool == false
 		|| p_memory_pool == NULL || p_head_free_memory_chunk == NULL)
 	{
-		return ::operator new (sizeof(T));   // malloc(sizeof(T));
+		return malloc(sizeof(T)); // ::operator new (sizeof(T));
 	}
 
 	// Get the address of the next available memory chunk
