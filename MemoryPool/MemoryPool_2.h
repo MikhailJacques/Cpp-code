@@ -70,8 +70,8 @@ It is good to keep this in mind for projects that require special handling of th
 
 */
 
-#ifndef MEMORY_POOL_2_H
-#define MEMORY_POOL_2_H
+#ifndef __MEMORY_POOL_2_H__
+#define __MEMORY_POOL_2_H__
 
 #include <limits.h>
 #include <stddef.h>
