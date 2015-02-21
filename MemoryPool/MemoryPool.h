@@ -114,7 +114,7 @@ void *MemoryPool<T>::Allocate(unsigned chunk_size, bool use_memory_pool) throw()
 	if (chunk_size > memory_chunk_size || use_memory_pool == false
 		|| p_memory_pool == NULL || p_head_free_memory_chunk == NULL)
 	{
-		// return malloc(sizeof(T)); // ::operator new (sizeof(T));
+		// return malloc(sizeof(T));
 		return ::operator new (sizeof(T));
 	}
 
@@ -201,16 +201,10 @@ T * MemoryPool<T>::Create(Args && ...args) throw()
 {
 	T * p = (T*)(Allocate(sizeof(T)));
 
-	// Requirement: Please note the embedded systems usually do not use RTTI & Exception mechanisms.
-	// try
-	// {
-	new (p)T(forward<Args>(args)...);
-	// }
-	// catch (...)
-	// {
-	// 	Deallocate(p);
-	// 	throw;
-	// }
+	if (p != NULL)
+	{
+		new (p)T(forward<Args>(args)...);
+	}
 
 	return p;
 }

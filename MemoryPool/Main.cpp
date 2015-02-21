@@ -48,7 +48,8 @@ int main()
 			// Free up all but the last 5 chunks in memory pool space
 			for (unsigned j = 0; j < CAPACITY - 5; j++)
 			{
-				pool.Remove(p[j]);
+				if (p[j] != NULL)
+					pool.Remove(p[j]);
 			}
 
 			// Reuse previously freed up chunks in memory pool space
@@ -60,7 +61,8 @@ int main()
 			// Free up the entire memory pool space
 			for (unsigned j = 0; j < CAPACITY; j++)
 			{
-				pool.Remove(p[j]);
+				if (p[j] != NULL)
+					pool.Remove(p[j]);
 			}
 		}
 
@@ -118,7 +120,8 @@ int main()
 
 			for (unsigned j = 0; j < CAPACITY - 5; j++)
 			{
-				delete p[j];
+				if (p[j] != NULL)
+					delete p[j];
 			}
 
 			for (unsigned j = 0; j < CAPACITY - 5; j++)
@@ -128,7 +131,8 @@ int main()
 
 			for (unsigned j = 0; j < CAPACITY; j++)
 			{
-				delete p[j];
+				if (p[j] != NULL)
+					delete p[j];
 			}
 
 		}
