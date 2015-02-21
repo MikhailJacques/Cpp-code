@@ -17,15 +17,15 @@ class MemoryPool
 {
 public:
 
-	MemoryPool(unsigned capacity);
-	~MemoryPool();
+	MemoryPool(unsigned capacity) throw();
+	~MemoryPool() throw();
 
-	void *Allocate(unsigned chunk_size, bool use_memory_pool = true);
-	void Deallocate(void *p);
+	void *Allocate(unsigned chunk_size, bool use_memory_pool = true) throw();
+	void Deallocate(void *p) throw();
 
 	template<typename... Args>
-	T * Create(Args && ...args);
-	void Remove(T * p);
+	T * Create(Args && ...args) throw();
+	void Remove(T * p) throw();
 
 private:
 
@@ -56,14 +56,14 @@ private:
 // Output parameters:
 //		None.
 template<typename T>
-MemoryPool<T>::MemoryPool(unsigned capacity) :
+MemoryPool<T>::MemoryPool(unsigned capacity) throw() :
 p_memory_pool(NULL), p_head_allocated_memory_chunk(NULL), p_head_free_memory_chunk(NULL),
-memory_pool_size((sizeof(T) + sizeof(struct Chunk)) * capacity), memory_chunk_size(sizeof(T))
+memory_pool_size((sizeof(T) + sizeof(struct Chunk)) * capacity), memory_chunk_size(sizeof(T)) 
 {
 	// Allocate a contiguous memory block on the heap
-	// p_memory_pool = ::operator new (sizeof(memory_pool_size));
-	p_memory_pool = ::malloc(memory_pool_size);
-
+	// p_memory_pool = ::malloc(memory_pool_size);
+	p_memory_pool = ::operator new (memory_pool_size);
+	
 	if (p_memory_pool != NULL)
 	{
 		struct Chunk *p_curr;
@@ -92,11 +92,10 @@ memory_pool_size((sizeof(T) + sizeof(struct Chunk)) * capacity), memory_chunk_si
 // Purpose:
 //		Deallocates system's memory block
 template<typename T>
-MemoryPool<T>::~MemoryPool()
+MemoryPool<T>::~MemoryPool() throw()
 {
-	// delete p_memory_pool;
-	::free(p_memory_pool);
-	
+	// ::free(p_memory_pool);
+	delete p_memory_pool;
 }
 
 // Requirement:  Chunk allocation – Returns a pointer to a clean memory region – O(1).
@@ -109,13 +108,14 @@ MemoryPool<T>::~MemoryPool()
 // Output parameters:
 //		A pointer to an allocated memory chunk.
 template<typename T>
-void *MemoryPool<T>::Allocate(unsigned chunk_size, bool use_memory_pool)
+void *MemoryPool<T>::Allocate(unsigned chunk_size, bool use_memory_pool) throw()
 {
 	// If either of the following conditions evaluates to true, invoke the memory allocation system call (optional)
 	if (chunk_size > memory_chunk_size || use_memory_pool == false
 		|| p_memory_pool == NULL || p_head_free_memory_chunk == NULL)
 	{
-		return malloc(sizeof(T)); // ::operator new (sizeof(T));
+		// return malloc(sizeof(T)); // ::operator new (sizeof(T));
+		return ::operator new (sizeof(T));
 	}
 
 	// Get the address of the next available memory chunk
@@ -153,7 +153,7 @@ void *MemoryPool<T>::Allocate(unsigned chunk_size, bool use_memory_pool)
 // Output parameters:
 //		None.
 template<typename T>
-void MemoryPool<T>::Deallocate(void *p)
+void MemoryPool<T>::Deallocate(void *p) throw()
 {
 	// Check to see if the pointer points to a valid memory chunk address within the memory pool address space.
 	// If true, remove it from the allocated memory linked-list and re-insert it into the deallocated memory linked list; 
@@ -180,8 +180,8 @@ void MemoryPool<T>::Deallocate(void *p)
 	}
 	else
 	{
-		free(p);
-		// delete p;
+		// free(p);
+		delete p;
 	}
 }
 
@@ -197,7 +197,7 @@ void MemoryPool<T>::Deallocate(void *p)
 //		Pointer of type T which points to the newly created instance.
 template<typename T>
 template<typename... Args>
-T * MemoryPool<T>::Create(Args && ...args)
+T * MemoryPool<T>::Create(Args && ...args) throw()
 {
 	T * p = (T*)(Allocate(sizeof(T)));
 
@@ -222,7 +222,7 @@ T * MemoryPool<T>::Create(Args && ...args)
 // Output parameters:
 //		None.
 template<typename T>
-void MemoryPool<T>::Remove(T * p)
+void MemoryPool<T>::Remove(T * p) throw()
 {
 	p->~T();
 	Deallocate(p);
