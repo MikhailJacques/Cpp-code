@@ -26,7 +26,7 @@ typedef struct
 } Params;
 
 void SpawnReadingThreads(const vector<string>& paths);
-void ReadTextFile(const std::string& file_path);
+void ReadTextFile(const string& file_path);
 
 void SpawnWritingThread(const Params& params);
 void WriteTextFile(const Params& params);
@@ -34,11 +34,11 @@ void WriteTextFile(const Params& params);
 void ReadUserInput(Options& options);
 void RemoveSpecialCharacters(string& token);
 
-std::mutex mtx;
+mutex mtx;
 
-CRITICAL_SECTION file_cs;
+// CRITICAL_SECTION file_cs;
 
-std::map<std::string, unsigned int> ordered_map_asc;
+map<string, unsigned int> ordered_map;
 
 int main(int argc, char** argv) 
 {
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
     ReadUserInput(params.options);
 
-    InitializeCriticalSection(&file_cs);
+    // InitializeCriticalSection(&file_cs);
 
     SpawnReadingThreads(params.input_files_paths);
 
@@ -64,31 +64,32 @@ int main(int argc, char** argv)
 
 void SpawnReadingThreads(const vector<string>& input_files_paths)
 {
-    std::vector<std::thread> threads;
+    vector<thread> threads;
     threads.reserve(input_files_paths.size());
 
     for (int i = 0; i < input_files_paths.size(); i++)
     {
-        std::thread th(&ReadTextFile, input_files_paths[i]);
-        threads.push_back(std::move(th));
+        thread th(&ReadTextFile, input_files_paths[i]);
+        threads.push_back(move(th));
     }
 
-    for (std::thread& th : threads)
+    for (thread& th : threads)
     {
         if (th.joinable())
             th.join();
     }
 }
 
-void ReadTextFile(const std::string& file_path)
+void ReadTextFile(const string& file_path)
 {
     if (file_path.empty() == false)
     {
-        EnterCriticalSection(&file_cs);
-        std::cout << "Thread ID: " << std::this_thread::get_id() << " processes file: " << file_path << endl;
-        LeaveCriticalSection(&file_cs);
+        //EnterCriticalSection(&file_cs);
+        //cout << "Thread ID: " << this_thread::get_id() << " processes file: " << file_path << endl;
+        //LeaveCriticalSection(&file_cs);
 
         ifstream file(file_path);
+
         if (file.is_open())
         {
             string token;
@@ -96,12 +97,16 @@ void ReadTextFile(const std::string& file_path)
             while (file >> token)
             {
                 RemoveSpecialCharacters(token);
-                std::transform(token.begin(), token.end(), token.begin(), ::tolower);
 
-                // std::lock_guard<std::mutex> guard(mtx); // RAII, exeption safe
-                mtx.lock();
-                ordered_map_asc[token]++;
-                mtx.unlock();
+                if (token.empty() == false)
+                {
+                    transform(token.begin(), token.end(), token.begin(), ::tolower);
+
+                    // lock_guard<mutex> guard(mtx); // RAII, exeption safe
+                    mtx.lock();
+                    ordered_map[token]++;
+                    mtx.unlock();
+                }
             }
 
             file.close();
@@ -111,25 +116,31 @@ void ReadTextFile(const std::string& file_path)
 
 void SpawnWritingThread(const Params& params)
 {
-    std::thread th(&WriteTextFile, params);
+    thread th(&WriteTextFile, params);
 
     if (th.joinable())
         th.join();
 }
 
-// void WriteTextFile(const std::string& file_path)
 void WriteTextFile(const Params& params)
 {
     ofstream output_file(params.output_file_path, ios::out);
 
     if (output_file.is_open())
     {
-        string most_frequent_word;
+        string most_frequent_word, delimeter;
         unsigned int most_frequent_word_cnt = 1;
+
+        switch (params.options.spliting_char)
+        {
+            case 's': delimeter.assign(" "); break;     // 34
+            case 'c': delimeter.assign(","); break;     // 44
+            case 'n': delimeter.assign("\n"); break;    // 92 + 110
+        }
 
         if (params.options.order == 'a')
         {
-            for (auto const& pair : ordered_map_asc)
+            for (auto const& pair : ordered_map)
             {
                 if (most_frequent_word_cnt < pair.second)
                 {
@@ -137,26 +148,24 @@ void WriteTextFile(const Params& params)
                     most_frequent_word_cnt = pair.second;
                 }
 
-                output_file << pair.first << "\n";
+                output_file << pair.first << delimeter;
             }
         }
-        else
+        else // params.options.order = 'd'
         {
-            std::map<std::string, unsigned int, greater<string>> ordered_map_desc(ordered_map_asc.begin(), ordered_map_asc.end());
-
-            for (auto const& pair : ordered_map_desc)
+            for (auto it = ordered_map.rbegin(); it != ordered_map.rend(); it++)
             {
-                if (most_frequent_word_cnt < pair.second)
+                if (most_frequent_word_cnt < it->second)
                 {
-                    most_frequent_word.assign(pair.first);
-                    most_frequent_word_cnt = pair.second;
+                    most_frequent_word.assign(it->first);
+                    most_frequent_word_cnt = it->second;
                 }
 
-                output_file << pair.first << "\n";
+                output_file << it->first << delimeter;
             }
         }
 
-        output_file << "The most frequent word in the text is: '"
+        output_file << "\nThe most frequent word in the text is: '"
             << most_frequent_word << "', count: " << most_frequent_word_cnt;
 
         output_file.close();
@@ -166,7 +175,7 @@ void WriteTextFile(const Params& params)
 void ReadUserInput(Options& options)
 {
     bool go = false;
-    std::string user_input;
+    string user_input;
 
     options.order = ' ';
     options.spliting_char = ' ';
