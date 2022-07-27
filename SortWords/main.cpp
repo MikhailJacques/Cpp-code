@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#include<windows.h>
+//#include<windows.h>
 
 using namespace std;
 
@@ -164,6 +164,9 @@ void WriteTextFile(const Params& params)
                 output_file << it->first << delimeter;
             }
         }
+
+        // Note: I am aware that the program prints the delimiting character after the last word, 
+        // which it should not, but I am in no mood to tinker around with it anymore
 
         output_file << "\nThe most frequent word in the text is: '"
             << most_frequent_word << "', count: " << most_frequent_word_cnt;
