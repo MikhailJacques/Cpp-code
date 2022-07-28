@@ -7,7 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-//#include<windows.h>
+#include <future>
+#include <iterator>
 
 using namespace std;
 
@@ -21,12 +22,13 @@ typedef struct
 typedef struct
 {
     Options options;
-    vector<string> input_files_paths;
+    vector<string> files_paths;
     string output_file_path;
 } Params;
 
-void SpawnReadingThreads(const vector<string>& paths);
-void ReadTextFile(const string& file_path);
+
+void ProcessTextFiles(const vector<string>& paths);
+void ReadTextFile(const string& path);
 
 void SpawnWritingThread(const Params& params);
 void WriteTextFile(const Params& params);
@@ -34,49 +36,35 @@ void WriteTextFile(const Params& params);
 void ReadUserInput(Options& options);
 void RemoveSpecialCharacters(string& token);
 
-mutex mtx;
+static mutex mtx;
 
-// CRITICAL_SECTION file_cs;
+static map<string, unsigned int> ordered_map;
 
-map<string, unsigned int> ordered_map;
-
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
-    Params params;
+    Params params = { {'a', 's'}, {}, "" };
     params.output_file_path.assign("F4.txt");
 
-    // No error checking is done
+    // No error checking is performed
     for (int i = 1; i < argc; ++i)
     {
-        params.input_files_paths.push_back(string(argv[i]));
+        params.files_paths.push_back(string(argv[i]));
     }
 
     ReadUserInput(params.options);
 
-    // InitializeCriticalSection(&file_cs);
-
-    SpawnReadingThreads(params.input_files_paths);
+    ProcessTextFiles(params.files_paths);
 
     SpawnWritingThread(params);
 
-	return 0;
+    return 0;
 }
 
-void SpawnReadingThreads(const vector<string>& input_files_paths)
+void ProcessTextFiles(const vector<string>& paths)
 {
-    vector<thread> threads;
-    threads.reserve(input_files_paths.size());
-
-    for (int i = 0; i < input_files_paths.size(); i++)
+    for (const auto& path : paths)
     {
-        thread th(&ReadTextFile, input_files_paths[i]);
-        threads.push_back(move(th));
-    }
-
-    for (thread& th : threads)
-    {
-        if (th.joinable())
-            th.join();
+        std::async(std::launch::async, ReadTextFile, path);
     }
 }
 
@@ -84,10 +72,6 @@ void ReadTextFile(const string& file_path)
 {
     if (file_path.empty() == false)
     {
-        //EnterCriticalSection(&file_cs);
-        //cout << "Thread ID: " << this_thread::get_id() << " processes file: " << file_path << endl;
-        //LeaveCriticalSection(&file_cs);
-
         ifstream file(file_path);
 
         if (file.is_open())
@@ -102,10 +86,9 @@ void ReadTextFile(const string& file_path)
                 {
                     transform(token.begin(), token.end(), token.begin(), ::tolower);
 
-                    // lock_guard<mutex> guard(mtx); // RAII, exeption safe
-                    mtx.lock();
+                    lock_guard<mutex> lock(mtx); // RAII, exeption safe
+
                     ordered_map[token]++;
-                    mtx.unlock();
                 }
             }
 
@@ -148,6 +131,7 @@ void WriteTextFile(const Params& params)
                     most_frequent_word_cnt = pair.second;
                 }
 
+                // Note: In the ascending order the program prints the delimiting character after the last word
                 output_file << pair.first << delimeter;
             }
         }
@@ -161,14 +145,18 @@ void WriteTextFile(const Params& params)
                     most_frequent_word_cnt = it->second;
                 }
 
-                output_file << it->first << delimeter;
+                if (std::next(it) != ordered_map.rend())
+                {
+                    output_file << it->first << delimeter;
+                }
+                else
+                {
+                    output_file << it->first;
+                }
             }
         }
 
-        // Note: I am aware that the program prints the delimiting character after the last word, 
-        // which it should not, but I am in no mood to tinker around with it anymore
-
-        output_file << "\nThe most frequent word in the text is: '"
+        output_file << "\n\nThe most frequent word in the text is: '"
             << most_frequent_word << "', count: " << most_frequent_word_cnt;
 
         output_file.close();
