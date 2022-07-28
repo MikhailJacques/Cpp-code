@@ -37,7 +37,6 @@ void ReadUserInput(Options& options);
 void RemoveSpecialCharacters(string& token);
 
 static mutex mtx;
-
 static map<string, unsigned int> ordered_map;
 
 int main(int argc, char** argv)
@@ -145,13 +144,11 @@ void WriteTextFile(const Params& params)
                     most_frequent_word_cnt = it->second;
                 }
 
+                output_file << it->first;
+
                 if (std::next(it) != ordered_map.rend())
                 {
-                    output_file << it->first << delimeter;
-                }
-                else
-                {
-                    output_file << it->first;
+                    output_file << delimeter;
                 }
             }
         }
