@@ -122,16 +122,29 @@ void WriteTextFile(const Params& params)
 
         if (params.options.order == 'a')
         {
-            for (auto const& pair : ordered_map)
+            //for (const auto& pair : ordered_map)
+            //{
+            //    if (most_frequent_word_cnt < pair.second)
+            //    {
+            //        most_frequent_word.assign(pair.first);
+            //        most_frequent_word_cnt = pair.second;
+            //    }
+
+            //    // Note: In the ascending order the program prints the delimiting character after the last word
+            //    output_file << pair.first << delimeter;
+            //}
+
+            // Using structured bindings
+            for (const auto&[word, cnt] : ordered_map)
             {
-                if (most_frequent_word_cnt < pair.second)
+                if (most_frequent_word_cnt < cnt)
                 {
-                    most_frequent_word.assign(pair.first);
-                    most_frequent_word_cnt = pair.second;
+                    most_frequent_word.assign(word);
+                    most_frequent_word_cnt = cnt;
                 }
 
                 // Note: In the ascending order the program prints the delimiting character after the last word
-                output_file << pair.first << delimeter;
+                output_file << word << delimeter;
             }
         }
         else // params.options.order = 'd'

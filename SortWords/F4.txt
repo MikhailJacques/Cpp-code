@@ -1,3 +1,34 @@
-your,years,wharves,there,the,some,sabbath,round,reefs,precisely,of,now,never,mind,manhattoes,long,isles,is,insular,indian,how,dreamy,coral,city,circumambulate,by,belted,as,ago,afternoon,a
+a
+afternoon
+ago
+as
+belted
+by
+circumambulate
+city
+coral
+dreamy
+how
+indian
+insular
+is
+isles
+long
+manhattoes
+mind
+never
+now
+of
+precisely
+reefs
+round
+sabbath
+some
+the
+there
+wharves
+years
+your
 
-The most frequent word in the text is: 'the', count: 2
+
+The most frequent word in the text is: 'by', count: 2
